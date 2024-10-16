@@ -1,0 +1,174 @@
+### Parallel Cluster ###
+# Create Parallel Cluster resources
+Region: us-east-1
+Image:
+  Os: alinux2
+Tags:
+  - Key: 'environment'
+    Value: ###Replace with CFNStackName output from the CloudFormation stack.
+  - Key: 'pcluster version'
+    Value: ###Replace with ParallelClusterVersion output from the CloudFormation stack.
+HeadNode:
+  InstanceType: t2.micro
+  Networking:
+    SubnetId: ###Replace with ManagementZone1SubnetId output from the CloudFormation stack.
+    ElasticIp: false
+    AdditionalSecurityGroups:
+      - ###Replace with ManagementZoneSecurityGroup output from the CloudFormation stack.
+  Ssh:
+    KeyName: ###Replace with SSHKeyName output from the CloudFormation stack.
+  LocalStorage:
+    RootVolume:
+      Size: 50
+      VolumeType: gp3
+  Iam:
+    S3Access:
+      - BucketName: ###Replace with CampaignStorageBucket output from the CloudFormation stack.
+### If modified stack setup Active Directory for your user directory store, uncomment the sections below
+# DirectoryService:
+#   DomainName: ###Replace with
+#   DomainAddr: ldaps://10.0.0.x,ldaps://10.0.0.x
+#   PasswordSecretArn: ###Replace with
+#   DomainReadOnlyUser: ###Replace with
+#   #LdapTlsCaCert: /etc/openldap/cacerts/ca.cer
+#   #LdapTlsReqCert: hard
+#   #LdapAccessFilter: memberOf=CN=Group01,OU=Groups,DC=###Replace###,DC=###Replace###
+#   AdditionalSssdConfigs:
+#     ldap_id_mapping: "False"
+#     ldap_schema: rfc2307bis
+#     ldap_user_name: cn
+#     ldap_user_fullname: displayName
+#     ldap_user_uuid: objectGUID
+#     ldap_user_gecos: displayName
+#     ldap_user_modify_timestamp: whenChanged
+#     ldap_group_uuid: objectGUID
+#     ldap_group_member: member
+#     ldap_group_modify_timestamp: whenChanged
+#     #ldap_group_search_base: OU=Groups,DC=###REPLACE###,DC=###REPLACE###
+#     ldap_netgroup_modify_timestamp: whenChanged
+#     ldap_referrals: "False"
+#     #ldap_search_base: OU=people,DC=###REPLACE###,DC=###REPLACE###
+#     override_homedir: /users/%u
+#     default_shell : /bin/bash
+#     ldap_auth_disable_tls_never_use_in_production: True
+Scheduling:
+  Scheduler: slurm
+  SlurmSettings:
+    ScaledownIdletime: 5
+    EnableMemoryBasedScheduling: true
+    Database:
+      Uri: ###Replace with RDSURI output from the CloudFormation stack.
+      UserName: ###Replace with RDSDatabaseAdminUsername output from the CloudFormation stack.
+      PasswordSecretArn: ###Replace with RDSDatabaseAdminPasswordSecret output from the CloudFormation stack.
+      DatabaseName: ###Replace with RDSDatabaseName output from the CloudFormation stack.
+  SlurmQueues:
+    - Name: cpu
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: cpu
+          InstanceType: c5n.xlarge
+          MinCount: 0
+          MaxCount: 4
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: False
+      ComputeSettings:
+        LocalStorage:
+          RootVolume:
+            Size: 100
+            VolumeType: gp3
+          EphemeralVolume:
+            MountDir: /localscratch
+      Networking:
+        SubnetIds:
+          - ###Replace with ComputeZoneSubnetId output from the CloudFormation stack.
+        PlacementGroup:
+          Enabled: false
+        AdditionalSecurityGroups:
+          - ###Replace with ComputeZoneSecurityGroup output from the CloudFormation stack.
+      Iam:
+        S3Access:
+          - BucketName: ###Replace with ampaignStorageBucket output from the CloudFormation stack.
+    - Name: ram
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: ram
+          InstanceType: r5n.xlarge
+          MinCount: 0
+          MaxCount: 4
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: False
+      ComputeSettings:
+        LocalStorage:
+          RootVolume:
+            Size: 100
+            VolumeType: gp3
+          EphemeralVolume:
+            MountDir: /localscratch
+      Networking:
+        SubnetIds:
+          - ###Replace with ComputeZoneSubnetId output from the CloudFormation stack.
+        PlacementGroup:
+          Enabled: false
+        AdditionalSecurityGroups:
+          - ###Replace with ComputeZoneSecurityGroup output from the CloudFormation stack.
+      Iam:
+        S3Access:
+          - BucketName: ###Replace with ampaignStorageBucket output from the CloudFormation stack.
+    - Name: gpu
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: gpu
+          Instances:
+            - InstanceType: g5.xlarge
+          MinCount: 0
+          MaxCount: 2
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: False
+      ComputeSettings:
+        LocalStorage:
+          RootVolume:
+            Size: 100
+            VolumeType: gp3
+          EphemeralVolume:
+            MountDir: /localscratch
+      Networking:
+        SubnetIds:
+          - ###Replace with ComputeZoneSubnetId output from the CloudFormation stack.
+        PlacementGroup:
+          Enabled: false
+        AdditionalSecurityGroups:
+          - ###Replace with ComputeZoneSecurityGroup output from the CloudFormation stack.
+      Iam:
+        S3Access:
+          - BucketName: ###Replace with ampaignStorageBucket output from the CloudFormation stack.
+SharedStorage:
+  - Name: fsxshared
+    StorageType: FsxLustre
+    MountDir: /scratch
+    FsxLustreSettings:
+      FileSystemId: ###Replace with FSxForLustreFileSystem output from the CloudFormation stack
+  - Name: efsshared
+    StorageType: Efs
+    MountDir: /group
+    EfsSettings:
+      FileSystemId: ###Replace with EFSFileSystem output from the CloudFormation stack
+  - Name: ebsshared
+    StorageType: Ebs
+    MountDir: /users
+    EbsSettings:
+      VolumeType: gp3
+      Encrypted: true
+      #DeletionPolicy: Retain
+      Size: 100
+Monitoring:
+  Logs:
+    CloudWatch:
+      Enabled: true
+      RetentionInDays: 30
+      #DeletionPolicy: Retain
+  Dashboards:
+    CloudWatch:
+      Enabled: true

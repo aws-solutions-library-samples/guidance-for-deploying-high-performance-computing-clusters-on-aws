@@ -1,5 +1,4 @@
-#Notes
-
+#Cloudformation Infrastructure Template
 AWSTemplateFormatVersion: '2010-09-09'
 Description: VPC with Private and Public Subnets, NAT Gateway, and VPC Flow Logs
  
@@ -7,7 +6,7 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  
+    
   VPCCidrBlock:
     Type: String
     Default: 10.0.0.0/16
@@ -23,14 +22,6 @@ Parameters:
       - 'No'
     Description: Do you want to set up FSx for Lustre?
 
-  RetainLustre:
-    Type: String
-    Default: 'Delete'
-    AllowedValues:
-      - 'Retain'
-      - 'Delete'
-    Description: Do you want to retain the Lustre file system if this stack is updated/deleted?
-
   UseEFS:
     Type: String 
     Default: 'Yes'
@@ -38,14 +29,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Description: Do you want to set up EFS?
-
-  RetainEFS:
-    Type: String
-    Default: 'Delete'
-    AllowedValues:
-      - 'Retain'
-      - 'Delete'
-    Description: Do you want to retain the EFS if this stack is updated/deleted?
 
   UseCampaignStorage:
     Type: String
@@ -55,14 +38,6 @@ Parameters:
       - 'No'
     Description: Do you want to set up Campaign Storage in S3?
 
-  RetainCampaignStorage:
-    Type: String
-    Default: 'Delete'
-    AllowedValues:
-      - 'Retain'
-      - 'Delete'
-    Description: Do you want to retain the Campaign Storage if this stack is updated/deleted?
-  
   UseArchivalStorage:
     Type: String
     Default: 'Yes'
@@ -70,33 +45,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Description: Do you want to set up Archival Storage in S3?
-
-  RetainArchivalStorage:
-    Type: String
-    Default: 'Delete'
-    AllowedValues:
-      - 'Retain'
-      - 'Delete'
-    Description: Do you want to retain the Archival Storage if this stack is updated/deleted?
-
-  ### If you'd like to have this stack setup Active Directory for your user directory store, uncomment the sections below
-  # ActiveDirectoryDomainName:
-  #   Type: String
-  #   Default: example.com
-  #   Description: Domain name for the Amazon Managed Active Directory
-
-  # ActiveDirectoryAdminUsername:
-  #   Type: String
-  #   Default: ad_admin
-  #   Description: Username for the Amazon Managed Active Directory
-
-  # RetainActiveDirectory:
-  #   Type: String
-  #   Default: 'Delete'
-  #   AllowedValues:
-  #     - 'Retain'
-  #     - 'Delete'
-  #   Description: Do you want to retain the Active Directory setup when this stack is updated/deleted?
 
   RDSDatabaseName:
     Type: String
@@ -107,14 +55,6 @@ Parameters:
     Type: String
     Default: slurmaccounting_admin
     Description: Username for the RDS MySQL database
-    
-  RetainRDS:
-    Type: String
-    Default: 'Delete'
-    AllowedValues:
-      - 'Retain'
-      - 'Delete'
-    Description: Do you want to retain the slurm accounting database when this stack is updated/deleted?
 
   SSHKey:
     Type: AWS::EC2::KeyPair::KeyName
@@ -126,6 +66,8 @@ Parameters:
     Type: String
     Default: 3.10.1
     AllowedValues:
+      - 3.11.1
+      - 3.11.0
       - 3.10.1
       - 3.10.0
       - 3.9.3
@@ -290,6 +232,7 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NATGateway
 
+
   ComputeZoneRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -331,6 +274,7 @@ Resources:
   VPCFlowLogsLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
+      #LogGroupName: VPCFlowLogs
       RetentionInDays: 90
 
   VPCFlowLogs:
@@ -404,7 +348,7 @@ Resources:
       Monitoring: true
       ImageId: !Ref LatestAmiId
       InstanceType: t2.micro
-      KeyName: !Ref SSHKey
+      KeyName: ws-default-keypair
       SecurityGroupIds:
           - !GetAtt AccessZoneSecurityGroup.GroupId
       SubnetId: !Ref AccessZoneSubnet
@@ -413,13 +357,11 @@ Resources:
           Value: LoginNode
       IamInstanceProfile: !Ref LoginNodeInstanceProfile
 
-### Storage ###
+  ### Storage ###
   # FSx for Lustre
   LustreFileSystem:
     Condition: UseLustreCondition
     Type: AWS::FSx::FileSystem
-    DeletionPolicy: !Ref RetainLustre
-    UpdateReplacePolicy: !Ref RetainLustre
     Properties:
       FileSystemType: LUSTRE
       StorageCapacity: 1200
@@ -450,8 +392,6 @@ Resources:
   EFSFileSystem:
     Condition: UseEFSCondition
     Type: AWS::EFS::FileSystem
-    DeletionPolicy: !Ref RetainEFS
-    UpdateReplacePolicy: !Ref RetainEFS
     Properties:
       Encrypted: TRUE
       LifecyclePolicies:
@@ -462,8 +402,6 @@ Resources:
   
   EFSMountTarget:
     Type: AWS::EFS::MountTarget
-    DeletionPolicy: !Ref RetainEFS
-    UpdateReplacePolicy: !Ref RetainEFS
     Properties:
       FileSystemId: !Ref EFSFileSystem
       SubnetId: !Ref DataStorageZoneSubnet
@@ -474,8 +412,6 @@ Resources:
   CampaignStorageBucket:
     Condition: UseCampaignStorageCondition
     Type: AWS::S3::Bucket
-    DeletionPolicy: !Ref RetainCampaignStorage
-    UpdateReplacePolicy: !Ref RetainCampaignStorage
     Properties:
       VersioningConfiguration:
         Status: Enabled
@@ -503,8 +439,6 @@ Resources:
   ArchivalStorageBucket:
     Condition: UseArchivalStorageCondition
     Type: AWS::S3::Bucket
-    DeletionPolicy: !Ref RetainArchivalStorage
-    UpdateReplacePolicy: !Ref RetainArchivalStorage
     Properties:
       VersioningConfiguration:
         Status: Enabled
@@ -528,43 +462,10 @@ Resources:
         - Key: Name
           Value: nist-800-223-s3-archival
 
-  ### User Directory ###
-  # AD Admin Password 
-  ### If you'd like to have this stack setup Active Directory for your user directory store, uncomment the sections below
-  # ActiveDirectoryAdminPasswordSecret:
-  #   Type: 'AWS::SecretsManager::Secret'
-  #   DeletionPolicy: !Ref RetainActiveDirectory
-  #   UpdateReplacePolicy: !Ref RetainActiveDirectory
-  #   Properties:
-  #     Description: "Dynamically generated password for AD Admin in Managed Active Directory"
-  #     GenerateSecretString:
-  #       PasswordLength: 30
-  #       ExcludeCharacters: '"@/\'
-  #     Tags:
-  #       -
-  #         Key: environment
-  #         Value: !Ref AWS::StackName
-  
-  # Amazon Managed Active Directory
-  # ManagedActiveDirectory:
-  #   Type: AWS::DirectoryService::MicrosoftAD
-  #   DeletionPolicy: !Ref RetainActiveDirectory
-  #   UpdateReplacePolicy: !Ref RetainActiveDirectory
-  #   Properties:
-  #     Name: !Ref ActiveDirectoryDomainName
-  #     Password: !Sub "{{resolve:secretsmanager:${ActiveDirectoryAdminPasswordSecret}:SecretString}}"
-  #     VpcSettings:
-  #       SubnetIds:
-  #         - !Ref ManagementZoneSubnet1
-  #         - !Ref ManagementZoneSubnet2
-  #       VpcId: !Ref VPC
-
   ### Slurm Accounting ###
   # RDS Admin Password
   RDSDatabaseAdminPasswordSecret:
     Type: AWS::SecretsManager::Secret
-    DeletionPolicy: !Ref RetainRDS
-    UpdateReplacePolicy: !Ref RetainRDS
     Properties:
       Description: "Dynamically generated password for Slurm Accounting DB in RDS"
       GenerateSecretString:
@@ -574,12 +475,12 @@ Resources:
         -
           Key: environment
           Value: !Ref AWS::StackName
+    #UpdateReplacePolicy: Retain
+    #DeletionPolicy: Retain
 
   # Create RDS MySQL database for Slurm accounting
   RDSDatabase:
     Type: AWS::RDS::DBInstance
-    DeletionPolicy: !Ref RetainRDS
-    UpdateReplacePolicy: !Ref RetainRDS
     Properties:
       DBName: !Ref RDSDatabaseName
       Engine: mysql
@@ -593,6 +494,7 @@ Resources:
         - !Ref RDSSecurityGroup
       StorageEncrypted: true
       BackupRetentionPeriod: 7
+      #DeletionProtection: true
       EnableCloudwatchLogsExports:
         - error
         - general
@@ -605,8 +507,6 @@ Resources:
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
-    DeletionPolicy: !Ref RetainRDS
-    UpdateReplacePolicy: !Ref RetainRDS
     Properties:
       DBSubnetGroupDescription: "Subnet group for RDS database"
       SubnetIds:
@@ -614,88 +514,118 @@ Resources:
         - !Ref ManagementZoneSubnet2
 
   ###Security###
-  ## Security Groups ##
-  # Resource Security Groups #
-  LoginNodeSecurityGroup:
+  # Security Groups
+  AccessZoneSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for Login Node
+      GroupDescription: Security group for access zone
       VpcId: !Ref VPC
-  LoginNodeSecurityGroupIngress:
+  AccessZoneSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow inbound SSH from apprvoed CIDR to Login Node
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
       CidrIp: !Ref AccessZoneAllowableCIDRBlock
-      GroupId: !GetAtt LoginNodeSecurityGroup.GroupId
-  LoginNodeSecurityGroupIngress1:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow inbound SSH from Managment Zone SG to Login Node
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
-      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
-      GroupId: !GetAtt LoginNodeSecurityGroup.GroupId
-
-  HeadNodeSecurityGroup:
+      GroupId: !GetAtt AccessZoneSecurityGroup.GroupId
+ 
+  ManagementZoneSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for Head Node
+      GroupDescription: Security group for management zone
       VpcId: !Ref VPC
-  HeadNodeSecurityGroupIngress:
+  ManagementZoneSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow inbound SSH from Login Node to Head Node
       IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
-      SourceSecurityGroupId: !GetAtt LoginNodeSecurityGroup.GroupId
-      GroupId: !GetAtt HeadNodeSecurityGroup.GroupId
-  HeadNodeSecurityGroupIngress1:
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt AccessZoneSecurityGroup.GroupId
+      GroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
+  ManagementZoneSecurityGroupIngress1:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow inbound SSH from Managment Zone SG to Head Node
       IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt RDSSecurityGroup.GroupId
+      GroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
+  ManagementZoneSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
       SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
-      GroupId: !GetAtt HeadNodeSecurityGroup.GroupId
-  HeadNodeSecurityGroupIngress2:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow inbound default slurm ports from Compute Nodes to Head Node
-      IpProtocol: tcp
-      FromPort: 6817
-      ToPort: 6830
-      SourceSecurityGroupId: !GetAtt ComputeNodeSecurityGroup.GroupId
-      GroupId: !GetAtt HeadNodeSecurityGroup.GroupId
+      GroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
 
-  ComputeNodeSecurityGroup:
+  ComputeZoneSubnetSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for Compute Node
+      GroupDescription: Security group for Compute zone subnet
       VpcId: !Ref VPC
-  ComputeNodeSecurityGroupIngress:
+  ComputeZoneSubnetSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow inbound default slurm ports from Head Node to Compute Nodes 
       IpProtocol: tcp
-      FromPort: 6817
-      ToPort: 6830
-      SourceSecurityGroupId: !GetAtt HeadNodeSecurityGroup.GroupId
-      GroupId: !GetAtt ComputeNodeSecurityGroup.GroupId
-  ComputeNodeSecurityGroupIngress1:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow inbound SSH from Managment Zone to Compute Nodes for management
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
+      FromPort: 0
+      ToPort: 65535
       SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
-      GroupId: !GetAtt ComputeNodeSecurityGroup.GroupId
+      GroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+  ComputeZoneSubnetSecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
+      GroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+  ComputeZoneSubnetSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+      GroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+  
+  DataStorageZoneSubnetSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for data storage zone subnet
+      VpcId: !Ref VPC
+  DataStorageZoneSubnetSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt AccessZoneSecurityGroup.GroupId
+      GroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
+  DataStorageZoneSubnetSecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+      GroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
+  DataStorageZoneSubnetSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
+      GroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
+  DataStorageZoneSubnetSecurityGroupIngress3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
+      GroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
   
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -705,11 +635,29 @@ Resources:
   RDSSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow inbound MySQL from Head Node to Slurm Accounting DB
+      Description: Allow all ports from Management Zone to RDS
       IpProtocol: tcp
-      FromPort: 3306
-      ToPort: 3306
-      SourceSecurityGroupId: !GetAtt HeadNodeSecurityGroup.GroupId
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
+      GroupId: !GetAtt RDSSecurityGroup.GroupId
+  RDSSecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow all ports from Compute Zone to RDS
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
+      GroupId: !GetAtt RDSSecurityGroup.GroupId
+  RDSSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow all ports from Data Storage Zone to RDS
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt RDSSecurityGroup.GroupId
       GroupId: !GetAtt RDSSecurityGroup.GroupId
 
   LustreSecurityGroup:
@@ -804,7 +752,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 2049
       ToPort: 2049
-      SourceSecurityGroupId: !GetAtt EFSSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
       GroupId: !GetAtt EFSSecurityGroup.GroupId
   EFSSecurityGroupIngress1:
     Condition: UseEFSCondition
@@ -813,7 +761,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 2049
       ToPort: 2049
-      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
       GroupId: !GetAtt EFSSecurityGroup.GroupId
   EFSSecurityGroupIngress2:
     Condition: UseEFSCondition
@@ -822,79 +770,10 @@ Resources:
       IpProtocol: tcp
       FromPort: 2049
       ToPort: 2049
-      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
-      GroupId: !GetAtt EFSSecurityGroup.GroupId
-  EFSSecurityGroupIngress3:
-    Condition: UseEFSCondition
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      IpProtocol: tcp
-      FromPort: 2049
-      ToPort: 2049
       SourceSecurityGroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
       GroupId: !GetAtt EFSSecurityGroup.GroupId
 
-  # Subnet Security Groups #
-  AccessZoneSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Default security group for access zone
-      VpcId: !Ref VPC
-  AccessZoneSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow all ports between resources with the default access zone security group
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt AccessZoneSecurityGroup.GroupId
-      GroupId: !GetAtt AccessZoneSecurityGroup.GroupId
- 
-  ManagementZoneSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Default security group for management zone
-      VpcId: !Ref VPC
-  ManagementZoneSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow all ports between resources with the default management zone security group
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
-      GroupId: !GetAtt ManagementZoneSecurityGroup.GroupId
 
-  ComputeZoneSubnetSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Default security group for Compute zone subnet
-      VpcId: !Ref VPC
-  ComputeZoneSubnetSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow all ports between resources with the default Compute zone subnet security group
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
-      GroupId: !GetAtt ComputeZoneSubnetSecurityGroup.GroupId
-  
-  DataStorageZoneSubnetSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Default security group for data storage zone subnet
-      VpcId: !Ref VPC
-  DataStorageZoneSubnetSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow all ports between resources with the default data storage zone subnet security group
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      SourceSecurityGroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
-      GroupId: !GetAtt DataStorageZoneSubnetSecurityGroup.GroupId
-  
 Outputs:
   VPCId:
     Description: The ID of the VPC
@@ -965,10 +844,6 @@ Outputs:
     Value: !Ref ArchivalStorageBucket
     Export:
       Name: ArchivalStorageBucket
-
-  # ActiveDirectoryID:
-  #   Description: ID of the Amazon Managed Active Directory
-  #   Value: !Ref ManagedActiveDirectory
 
   RDSURI:
     Description: Endpoint of the RDS MySQL database

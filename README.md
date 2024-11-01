@@ -9,14 +9,16 @@ List the top-level sections of the README template, along with a hyperlink to th
 ### Required
 
 1. [Overview](#overview-required)
+    - [Architecure](#architecture)
     - [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
+    - [AWS Services in this guidance](#aws-services-in-this-guidance)
+3. [Prerequisites](#prerequisites-required)
     - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+4. [Deployment Steps](#deployment-steps-required)
+5. [Deployment Validation](#deployment-validation-required)
+6. [Running the Guidance](#running-the-guidance-required)
+7. [Next Steps](#next-steps-required)
+8. [Cleanup](#cleanup-required)
 
 ***Optional***
 
@@ -35,77 +37,81 @@ List the top-level sections of the README template, along with a hyperlink to th
 2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
     - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
 
-### Cost ( required )
+## TO DO UPDATE FOR THIS SPECIFIC GUIDANCE
+## AWS Services in this Guidance
 
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. Provide an in-depth cost breakdown table in this section below ( you should use AWS Pricing Calculator to generate cost breakdown ).
+The following AWS Services are deployed in this Guidance:
 
-Start this section with the following boilerplate text:
-
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
-
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
-
-Suggest you keep this boilerplate text:
-_We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
-
-### Sample Cost Table ( required )
-
-**Note : Once you have created a sample cost table using AWS Pricing Calculator, copy the cost breakdown to below table and upload a PDF of the cost estimation on BuilderSpace. Do not add the link to the pricing calculator in the ReadMe.**
-
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
-
-| AWS service  | Dimensions | Cost [USD] |
-| ----------- | ------------ | ------------ |
-| Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
-| Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
-
-## Prerequisites (required)
-
-### Operating System (required)
-
-- Talk about the base Operating System (OS) and environment that can be used to run or deploy this Guidance, such as *Mac, Linux, or Windows*. Include all installable packages or modules required for the deployment. 
-- By default, assume Amazon Linux 2/Amazon Linux 2023 AMI as the base environment. All packages that are not available by default in AMI must be listed out.  Include the specific version number of the package or module.
-
-**Example:**
-“These deployment instructions are optimized to best work on **<Amazon Linux 2 AMI>**.  Deployment in another OS may require additional steps.”
-
-- Include install commands for packages, if applicable.
+| **AWS service**  | Description |
+|-----------|------------|
+|[Amazon VPC](https://aws.amazon.com/vpc/)|Core Service - provides additional Networking isolation and security | 
+|[Amazon EC2](https://aws.amazon.com/ec2/)|Core Service - EC2 instances used as cluster nodes |
+|[Amazon API Gateway](https://aws.amazon.com/api-gateway/)|Core service - create, publish, maintain, monitor, and secure APIs at scale|
+|[Amazon Cognito](https://aws.amazon.com/cognito/)|Core service - provides user identity and access management (IAM) services|
+|[Amazon Lambda](https://aws.amazon.com/lambda/)|Core service - provides serverless automation of user authentication|
+|[Amazon FSx for Lustre](https://aws.amazon.com/fsx/lustre/)|Core service - provides high-performance Lustre file system |
+|[Amazon Parallel Cluster](https://aws.amazon.com/hpc/parallelcluster/)|Core service - Open source cluster management tool for deployment and management of High Performance Computing (HPC) clusters |
+|[Amazon High Performance Computing HPC cluster](https://aws.amazon.com/hpc/)|Core service - high performance compute resource|
+|[Amazon System Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)|Auxiliary service - instance connection management|
 
 
-### Third-party tools (If applicable)
+## Plan your deployment
 
-*List any installable third-party tools required for deployment.*
+### Supported AWS Regions
 
+This Guidance uses EC2 services with [specific instances such as `hpc6`](https://aws.amazon.com/ec2/instance-types/hpc6/) and FSx for Lustre storage services, which may not currently be available in all AWS Regions. You must launch this solution in an AWS Region where EC2 specific instance types and FSx is available. For the most current availability of AWS services by Region, refer to the [AWS
+Regional Services
+List](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/).
 
-### AWS account requirements (If applicable)
-
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
-
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
-
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
+**Guidance for Building a High-Performance Numerical Weather Prediction System on AWS** is currently supported in the following AWS Regions (based on availability of [hpc6a](https://aws.amazon.com/ec2/instance-types/hpc6a/), [hpc7a](https://aws.amazon.com/ec2/instance-types/hpc7a/) and [hpc7g](https://aws.amazon.com/ec2/instance-types/hpc7g/) instances:
 
 
-### aws cdk bootstrap (if sample code has aws-cdk)
+| AWS Region     | Amazon EC2 HPC Optimized Instance type                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ap-southeast-1 | hpc6a.48xlarge                                                                                                           |
+| eu-north-1     | hpc6id.32xlarge<br>  hpc6a.48xlarge                                                                                      |
+| eu-west-1      | hpc7a.12xlarge<br> hpc7a.24xlarge<br> hpc7a.48xlarge<br> hpc7a.96xlarge<br>                                              |
+| us-east-1      | hpc7g.4xlarge<br> hpc7g.8xlarge<br> hpc7g.16xlarge<br>                                                                   |
+| us-east-2      | hpc6a.48xlarge <br> hpc6id.32xlarge <br> hpc7a.12xlarge <br> hpc7a.24xlarge <br> hpc7a.48xlarge <br> hpc7a.96xlarge <br> |
 
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
+### Cost 
 
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
+You are responsible for the cost of the AWS services used while running this guidance. 
 
-### Service limits  (if applicable)
+Please refer to the [sample pricing webpage](https://calculator.aws/#/estimate?id=67ae5451a69c58dacd7dd7235a61834ae07e6f61) for each AWS Service used in this Guidance. Please note that monthly costs assume that an HPC cluster with Head Node of instanceType `c6a.2xlarge` and two Compute Nodes  of instanceType `hpc6a.48xlarge` with `1200 GB` of FSx for Lustre persistent storage provisioned for that cluster that are active 50%. In reality, computeNodes get de-provisonied around 10 min after completing a job and therefore monthly cost would be lower than this  estimate.
 
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
+#### Sample cost table (Update needed) 
 
-### Supported Regions (if applicable)
+The following table provides a sample cost breakdown for an HPC cluster with one `c6a.2xlarge` Head Node and two Compute Nodes  of instanceType `hpc6a.48xlarge` with `1200 GB` of FSx for Lustre persistent storage allocated for it deployed in the `us-east-2` region: 
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
 
+| Node Processor Type | On Demand Cost/month USD| 
+| --------------------| ----------------- |
+| *c6a.2xlarge*       |  $226.58            |   
+| *hpc6a.48xlarge*    |  $2,102.40            |  
+| *FSx Lustre storage*|  $720.07           |  
+| *VPC, subnets*|  $283.50           |  
+| *Total estimate*|  $3,332.55       |
+
+### Security
+
+When you build systems on AWS infrastructure, security responsibilities are shared between you and AWS. This [shared responsibility
+model](https://aws.amazon.com/compliance/shared-responsibility-model/) reduces your operational burden because AWS operates, manages, and
+controls the components including the host operating system, the virtualization layer, and the physical security of the facilities in
+which the services operate. For more information about AWS security, visit [AWS Cloud Security](http://aws.amazon.com/security/).
+
+[AWS ParallelCluster](https://aws.amazon.com/hpc/parallelcluster/) users are securely authenticiated and authorized to their roles via [Amazon Cognito](https://aws.amazon.com/cognito/) user pool service. HPC cluster EC2 components are deployed into a Virtual Private Cloud (VPC) which provides additional network security isolation for all contained components. Head Node is depoyed into a Public subnet and available for access via secure connections (SSH and DCV), compute nodes are deployed into Private subnet and managed from Head node via SLURM package manager. Data stored in Amazon FSx for Lustre is [enrypted at rest and in transit](https://docs.aws.amazon.com/fsx/latest/LustreGuide/encryption-fsxl.html).
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+## Deployment Steps
+<!-- TO DO: update the link once is published -->
+
+<b>Please see published [Implementation Guide](https://aws-solutions-library-samples.github.io/compute/building-a-high-performance-numerical-weather-prediction-system-on-aws.html#create-and-connect-to-the-hpc-cluster) for step-by-step deployment instructions for this guidance.</b>
+
+
+
+## END TO DO
 
 ## Deployment Steps (required)
 
@@ -208,3 +214,6 @@ Include a legal disclaimer
 ## Authors (optional)
 
 Name of code contributors
+## License
+
+This library is licensed under the MIT-0 License. See the LICENSE file.

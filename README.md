@@ -187,7 +187,7 @@ This deployment requires you have access to Amazon CloudFormation in your AWS ac
 
 * Open CloudFormation console and verify the status of the template with the name starting with each of the names above.
 
-![Validate](/assets/images/deployment_steps/0_Validate.png)
+![Validate](/assets/images/deployment_steps/0_validate.png)
 
 * Make sure that all CloudFormation stacks have a status of "CREATE_COMPLETE"
 

@@ -225,11 +225,10 @@ Alternative, when you launch the 5_pcluster.yaml CloudFormation template you can
 
 ## Cleanup (required)
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
-
-
-
+1. In the AWS Management Console, navigate to CloudFormation and locate the 6 stacks deployed.
+2. Starting with the most recent stack (not including any nested stacks), select the stack and click delete
+3. Repeat this for each of the 6 stacks deployed to remove all resources from your account
+   
 ## FAQ, known issues, additional considerations, and limitations (optional)
 
 

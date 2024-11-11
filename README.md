@@ -11,20 +11,18 @@ List the top-level sections of the README template, along with a hyperlink to th
 1. [Overview](#overview)
 2. [Architecture Overview](#architecture-overview)
     - [Cost](#cost)
-3. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-4. [Deployment Steps](#deployment-steps-required)
-5. [Deployment Validation](#deployment-validation-required)
-6. [Running the Guidance](#running-the-guidance-required)
-7. [Next Steps](#next-steps-required)
-8. [Cleanup](#cleanup-required)
+3. [Prerequisites](#prerequisites)
+4. [Deployment Steps](#deployment-steps)
+5. [Deployment Validation](#deployment-validation)
+6. [Next Steps](#next-steps)
+7. [Cleanup](#cleanup)
 
 ***Optional***
 
 8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
 9. [Revisions](#revisions-optional)
 10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
+11. [Authors](#authors)
 
 ## Overview
 
@@ -107,7 +105,7 @@ This deployment requires you have access to Amazon CloudFormation in your AWS ac
 - AWS Systems Manager
 - All service used by AWS ParallelCluster
 
-## Deployment Steps (required)
+## Deployment Steps
 
 1. Clone the repo:
    - ```git clone https://github.com/aws-solutions-library-samples/guidance-for-building-nist-sp-800-223-hpc-on-aws.git```
@@ -223,7 +221,7 @@ Alternative, when you launch the 5_pcluster.yaml CloudFormation template you can
 8. Follow the instructions on the screen to login to your instance
 
 
-## Cleanup (required)
+## Cleanup
 
 1. In the AWS Management Console, navigate to CloudFormation and locate the 6 stacks deployed.
 2. Starting with the most recent stack (not including any nested stacks), select the stack and click delete
@@ -267,9 +265,9 @@ Include a legal disclaimer
 *Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
 
-## Authors (optional)
+## Authors
 
-Name of code contributors
+Chris Riddle - Sr. Solutions Architect at AWS
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.

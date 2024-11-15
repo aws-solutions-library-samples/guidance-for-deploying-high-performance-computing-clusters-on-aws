@@ -184,6 +184,8 @@ Exports View
 
 ***Important: Stacks 1-5 will have a parameter that asks for the previous stack names.  If you modify the stack names from the default values, you will need to also update the parameters in each subsequent stack with the appropriate name so that the relevant services can be referenced.***
 
+***Note: The storage, Slurm database, Active Directory, and AWS ParallelCluster stacks are intended to be simple examples for testing the NIST SP 800-223 reference architecture.  For more production ready versions of these templates see our [HPC Recipes](https://github.com/aws-samples/aws-hpc-recipes/tree/main/recipes) repo***
+
 ### Default Stack Names
 
 | Template File Name  | Stack Name  |

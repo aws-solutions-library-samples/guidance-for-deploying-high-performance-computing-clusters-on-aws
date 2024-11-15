@@ -69,6 +69,17 @@ The following table provides a sample cost breakdown for deploying this Guidance
 
 ***Note: This focus of this Guidance is to provide an example of securing the underlying AWS services and infrastructure that an HPC cluster will eventually run on.  It does not aim to include any costs related to running an actual HPC workload.  Please use the [AWS Pricing Calculator](https://calculator.aws/) to estimate any additional costs related to your specific HPC workload usecase.***
 
+### Security
+
+When you build systems on AWS infrastructure, security responsibilities are shared between you and AWS. This [shared responsibility
+model](https://aws.amazon.com/compliance/shared-responsibility-model/) reduces your operational burden because AWS operates, manages, and
+controls the components including the host operating system, the virtualization layer, and the physical security of the facilities in
+which the services operate. For more information about AWS security, visit [AWS Cloud Security](http://aws.amazon.com/security/).
+
+[AWS ParallelCluster](https://aws.amazon.com/hpc/parallelcluster/) users can be securely authenticiated and authorized using [Amazon Manageged Microsoft Active Directory](https://aws.amazon.com/directoryservice/). HPC cluster EC2 components are deployed into a Virtual Private Cloud (VPC) which provides additional network security isolation for all contained components. Login Node is depoyed into a Public subnet and available for access via secure connections (SSH and SSM), Head Node is depoyed into a Private subnet and available for access via secure connections (SSH and SSM), compute nodes are deployed into Private subnet and managed from Head node via SLURM package manager, Slurm accounting database is deployed into a Private subnet and managed from the Head node using Slurm. Data stored in Amazon S3, Amazon EFS, and Amazon FSx for Lustre is [enrypted at rest and in transit](https://docs.aws.amazon.com/whitepapers/latest/logical-separation/encrypting-data-at-rest-and--in-transit.html).  Access to other AWS services from AWS ParallelCluster components are secured over [VPC Endpoints](https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html) from a Private management subnet.
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
 ## Prerequisites
 
 ### SSH Access
@@ -185,7 +196,7 @@ This deployment requires you have access to Amazon CloudFormation in your AWS ac
 
 * Open CloudFormation console and verify the status of the template with the name starting with each of the names above.
 
-![Validate](/assets/images/deployment_steps/0_validate.png)
+<img src="https://github.com/aws-solutions-library-samples/guidance-for-building-nist-sp-800-223-hpc-on-aws/raw/main/assets/images/deployment_steps/0_validate.png" alt="Validate" width="200" height="400">
 
 * Make sure that all CloudFormation stacks have a status of "CREATE_COMPLETE"
 

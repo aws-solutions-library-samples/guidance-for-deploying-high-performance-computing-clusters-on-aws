@@ -188,8 +188,8 @@ Exports View
 | Template File Name  | Stack Name  |
 | ----------- | ------------ |
 | 0_network.yaml | nist-network  |
-| 1_security.yaml | nist-network  |
-| 2_storage.yaml | nist-network  |
+| 1_security.yaml | nist-security  |
+| 2_storage.yaml | nist-storage  |
 | 3_slurm_db.yaml | nist-database  |
 | 4_active_directory.yaml | nist-ad  |
 | 5_pcluster.yaml | nist-hpc  |

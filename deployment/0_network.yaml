@@ -1112,27 +1112,27 @@ Resources:
           - !Ref AWS::NoValue
       VpcId: !Ref VPC
 
-  ECRDockerEndpoint:
-    Type: "AWS::EC2::VPCEndpoint"
-    Properties:
-      ServiceName: 
-        !Join [ ".", [ !FindInMap [ServiceNamePrefixMap, !Ref "AWS::Partition", Name], !Ref "AWS::Region", "ecr.dkr" ] ]
-      VpcEndpointType: Interface
-      PrivateDnsEnabled: true 
-      SecurityGroupIds:
-        - !GetAtt EndpointSecurityGroup.GroupId
-      SubnetIds:
-        - !Ref ManagementSubnetA
-        - !Ref ManagementSubnetB
-        - Fn::If:
-          - HasMoreThan2Azs
-          - !Ref ManagementSubnetC
-          - !Ref AWS::NoValue
-        - Fn::If:
-          - HasMoreThan3Azs
-          - !Ref ManagementSubnetD
-          - !Ref AWS::NoValue
-      VpcId: !Ref VPC
+  # ECRDockerEndpoint:
+  #   Type: "AWS::EC2::VPCEndpoint"
+  #   Properties:
+  #     ServiceName: 
+  #       !Join [ ".", [ !FindInMap [ServiceNamePrefixMap, !Ref "AWS::Partition", Name], !Ref "AWS::Region", "ecr.dkr" ] ]
+  #     VpcEndpointType: Interface
+  #     PrivateDnsEnabled: true 
+  #     SecurityGroupIds:
+  #       - !GetAtt EndpointSecurityGroup.GroupId
+  #     SubnetIds:
+  #       - !Ref ManagementSubnetA
+  #       - !Ref ManagementSubnetB
+  #       - Fn::If:
+  #         - HasMoreThan2Azs
+  #         - !Ref ManagementSubnetC
+  #         - !Ref AWS::NoValue
+  #       - Fn::If:
+  #         - HasMoreThan3Azs
+  #         - !Ref ManagementSubnetD
+  #         - !Ref AWS::NoValue
+  #     VpcId: !Ref VPC
 
   EBSEndpoint:
     Type: "AWS::EC2::VPCEndpoint"

@@ -174,9 +174,9 @@ This deployment requires you have access to Amazon CloudFormation in your AWS ac
 
 ![Outputs](/assets/images/deployment_steps/8_deployment.png)
 
-<img src="https://github.com/aws-solutions-library-samples/guidance-for-building-nist-sp-800-223-hpc-on-aws/raw/main/assets/images/deployment_steps/9_deployment.png" alt="Validate" width="400" height="300">
+![Exports](/assets/images/deployment_steps/9_deployment.png)
 
-1.  Repeat the steps above starting with step 7. moving on to the next stack in the deployment folder
+24. Repeat the steps above starting with step 7. moving on to the next stack in the deployment folder
 
 ***Important: Stacks 1-5 will have a parameter that asks for the previous stack names.  If you modify the stack names from the default values, you will need to also update the parameters in each subsequent stack with the appropriate name so that the relevant services can be referenced.***
 

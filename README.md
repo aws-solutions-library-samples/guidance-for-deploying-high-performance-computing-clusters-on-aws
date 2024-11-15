@@ -11,18 +11,15 @@ List the top-level sections of the README template, along with a hyperlink to th
 1. [Overview](#overview)
 2. [Architecture Overview](#architecture-overview)
     - [Cost](#cost)
-3. [Prerequisites](#prerequisites)
-4. [Deployment Steps](#deployment-steps)
-5. [Deployment Validation](#deployment-validation)
-6. [Next Steps](#next-steps)
-7. [Cleanup](#cleanup)
-
-***Optional***
-
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors)
+3. [Security](#security)
+4. [Prerequisites](#prerequisites)
+5. [Deployment Steps](#deployment-steps)
+6. [Deployment Validation](#deployment-validation)
+7. [Next Steps](#next-steps)
+8. [Cleanup](#cleanup)
+9. [Notices](#notices)
+10. [Authors](#authors)
+11. [License](#license)
 
 ## Overview
 
@@ -197,7 +194,6 @@ Exports View
 | 4_active_directory.yaml | nist-ad  |
 | 5_pcluster.yaml | nist-hpc  |
 
-
 ## Deployment Validation 
 
 * Open CloudFormation console and verify the status of the template with the name starting with each of the names above.
@@ -229,7 +225,7 @@ Alternative, when you launch the 5_pcluster.yaml CloudFormation template you can
 
 1. Locate your ssh key pair
 2. Ensure you have the proper permissions set on the key pair (read-only access)
-   ```chmod 400 /path/key/ssh_key.pen```
+   ```chmod 400 /path/key/ssh_key.pem```
 3. In the list of services select EC2
 4. On the left hand menu select Instances
 5. Locate either the head node or the login node and select one instance by checking the box to the left of the instance
@@ -247,10 +243,10 @@ Alternative, when you launch the 5_pcluster.yaml CloudFormation template you can
 
 Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
-
 ## Authors
 
 Chris Riddle - Sr. Solutions Architect at AWS
+
 ## License
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.

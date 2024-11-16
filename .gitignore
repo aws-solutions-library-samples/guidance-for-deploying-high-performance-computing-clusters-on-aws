@@ -1,6 +1,9 @@
 ### testing ###
 testing
 
+### security scan ###
+scan_output
+
 ### vsCode ###
 .vscode
 

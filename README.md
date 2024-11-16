@@ -8,18 +8,28 @@ List the top-level sections of the README template, along with a hyperlink to th
 
 ### Required
 
-1. [Overview](#overview)
-2. [Architecture Overview](#architecture-overview)
+- [Guidance for Secure High-Performance Computing with NIST SP 800-223 on AWS](#guidance-for-secure-high-performance-computing-with-nist-sp-800-223-on-aws)
+  - [Table of Contents (required)](#table-of-contents-required)
+    - [Required](#required)
+  - [Overview](#overview)
+  - [Architecture Overview](#architecture-overview)
+    - [Architecture diagrams](#architecture-diagrams)
     - [Cost](#cost)
-3. [Security](#security)
-4. [Prerequisites](#prerequisites)
-5. [Deployment Steps](#deployment-steps)
-6. [Deployment Validation](#deployment-validation)
-7. [Next Steps](#next-steps)
-8. [Cleanup](#cleanup)
-9. [Notices](#notices)
-10. [Authors](#authors)
-11. [License](#license)
+    - [Cost Table](#cost-table)
+    - [Security](#security)
+  - [Prerequisites](#prerequisites)
+    - [SSH Access](#ssh-access)
+    - [AWS account requirements (If applicable)](#aws-account-requirements-if-applicable)
+  - [Deployment Steps](#deployment-steps)
+    - [Default Stack Names](#default-stack-names)
+  - [Deployment Validation](#deployment-validation)
+  - [Next Steps](#next-steps)
+    - [Login via SSM](#login-via-ssm)
+    - [Login via SSH](#login-via-ssh)
+  - [Cleanup](#cleanup)
+  - [Notices](#notices)
+  - [Authors](#authors)
+  - [License](#license)
 
 ## Overview
 
@@ -37,13 +47,7 @@ We developed this guidance in response to the growing need for secure HPC enviro
 
 Architecture diagrams below show sample NIST 800-223 based architecture, provisoning and deployment process using cloudformation, HPC Cluster deployment, and user interactions via AWS ParallelCluster
 
-### Network, Security, Storage, Database, and User Directory Infrastructure
-
-![Infrastructure](/assets/images/ref-arch-infrastructure.png "Reference Architecture")
-
-### HPC Cluster via AWS ParallelCluster
-
-![Infrastructure](/assets/images/ref-arch-cluster.png "Reference Architecture")
+![Infrastructure](/assets/images/ref-arch.png "Reference Architecture")
 
 ### Cost
 

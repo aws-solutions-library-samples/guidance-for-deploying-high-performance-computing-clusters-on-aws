@@ -45,7 +45,7 @@ We developed this guidance in response to the growing need for secure HPC enviro
 
 ### Architecture diagrams
 
-Architecture diagrams below show sample NIST 800-223 based architecture, provisoning and deployment process using cloudformation, HPC Cluster deployment, and user interactions via AWS ParallelCluster
+Architecture diagrams below show sample NIST 800-223 based architecture, provisoning and deployment process using cloudformation, HPC Cluster deployment, and user interactions via AWS ParallelCluster.  Depending on the region you deploy the solution in, it will automatically scale to from 2-4 AZs in order to maximize availability and redundancy of your cluster.
 
 ![Infrastructure](/assets/images/ref-arch.png "Reference Architecture")
 

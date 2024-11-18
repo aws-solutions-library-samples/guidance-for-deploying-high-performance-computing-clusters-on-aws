@@ -89,6 +89,25 @@ Resources:
             S3Access:
               - BucketName:
                   Fn::ImportValue: !Sub '${NISTStorageStackName}-CampaignStorageBucket'
+        LoginNodes:
+          Pools:
+             - Name: external
+               Count: 1
+               InstanceType: t2.micro
+               GracetimePeriod: 5
+               Ssh:
+                KeyName: !Ref SSHKeyName
+               Networking:
+                SubnetIds: 
+                  - Fn::ImportValue: !Sub '${NISTNetworkStackName}-AccessZoneSubnet'
+                AdditionalSecurityGroups:
+                  - Fn::ImportValue: !Sub '${NISTSecurityStackName}-LoginNodeSecurityGroupID'
+                  - Fn::ImportValue: !Sub '${NISTNetworkStackName}-AccessZoneSecurityGroupID'
+                  - Fn::ImportValue: !Sub '${NISTStorageStackName}-EFSSecurityGroupID'
+                  - Fn::ImportValue: !Sub '${NISTStorageStackName}-FSxLSecurityGroupID'
+               Iam:
+                 AdditionalIamPolicies:
+                  - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         DirectoryService:
           DomainName: 
             Fn::ImportValue: !Sub '${NISTADStackName}-Domain'

@@ -222,7 +222,7 @@ You can begin using the cluster by logging into either its Login node to submit 
 ### Login via AWS Systems Manager (SSM) 
 
 1. In the search bar above type in `EC2`
-2. In the list of services select EC2
+2. In the list of services select `EC2`
 3. On the left hand menu select `Instances`
 4. Locate either the head node or the Login node and select that instance by checking the box to the left of it
 5. Locate the `Connect` button near the top of the screen
@@ -251,11 +251,11 @@ Alternatively, when you launch the `5_pcluster.yaml` CloudFormation template, yo
    
 ## Notices
 
-Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
+Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.
 
 ## Authors
 
-Chris Riddle - Sr. Solutions Architect AWS
+Chris Riddle - Sr. Solutions Architect AWS <br/>
 Daniel Zilberman - Sr. Solutions Architect AWS
 
 ## License

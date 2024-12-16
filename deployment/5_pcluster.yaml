@@ -59,9 +59,6 @@ Resources:
       ClusterName: !Sub 'c-${AWS::StackName}'
       DeletionPolicy: !Ref RetainCluster
       ClusterConfiguration:
-        DevSettings:
-          Timeouts:
-            HeadNodeBootstrapTimeout: 3600
         Image:
             Os: alinux2
         Tags:

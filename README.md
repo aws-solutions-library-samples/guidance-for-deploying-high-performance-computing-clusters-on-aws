@@ -46,9 +46,26 @@ We developed this guidance in response to the growing need for secure HPC enviro
 
 ### Architecture diagrams
 
-Architecture diagrams below show sample NIST 800-223 based architecture, provisoning and deployment process using cloudformation, HPC Cluster deployment, and user interactions via AWS ParallelCluster.  Depending on the region you deploy the guidance in, it will automatically scale to from 2-4 AZs in order to maximize availability and redundancy of your cluster.
+Architecture diagrams below show sample NIST 800-223 based infrastructure architecture, provisoning and deployment process using cloudformation, HPC Cluster deployment, and user interactions via AWS ParallelCluster.  Depending on the region you deploy the guidance in, it will automatically scale to from 2-4 AZs in order to maximize availability and redundancy of your cluster.
 
-![Reference Architecture](/assets/images/ref-arch.png "Reference Architecture")
+<!-- ![Reference Architecture](/assets/images/ref-arch.png "Reference Architecture") -->
+![Reference Architecture](/assets/images/deploying-high-performance-computing-clusters-on-aws-hpc-cluster-deployment1.png "Reference Architecture p 1")
+
+(1) Admin/DevOps users can deploy this architecture using a series of AWS CloudFormation templates. These templates provision networking resources, including [Amazon Virtual Private Cloud (Amazon VPC)](https://aws.amazon.com/cloudformation/) and subnets. The templates also provision resources for security and storage, such as [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/), [Amazon Elastic File System (Amazon EFS)](https://aws.amazon.com/efs/), and [Amazon FSx for Lustre](https://aws.amazon.com/fsx/lustre/). There are optional templates included to deploy a Slurm accounting database (DB) and a Microsoft Active Directory user directory. <br/>
+(2) Four logical subnets (zones) are created, each in multiple [Availability Zones (AZs)](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/?id=Availability_Zones), based on the target AWS Region. All required networking, networking access control list (ACLs), routes, and security resources are deployed. deployed subnets for the Storage Zone. An FSx for Lustre file system is created that is used as a highly performant scratch file system in the preferred AZ. The four zones are: 1) Access Zone (public subnet), 2) Compute Zone, 3) Management Zone, and 4) Storage Zone (all private subnets).<br/>
+(3) An [Amazon RDS for MySQL](https://aws.amazon.com/rds/mysql/) instance is created that will be used as the Slurm Accounting Database. This is set up in a single zone, or can be modified to be multi-AZ if preferred. One [AWS Directory Service](https://aws.amazon.com/directoryservice/) user directory is created across two AZs.<br/>
+(4) An Amazon EFS file system is created for shared cluster storage that is mounted in all of the deployed subnets for the Storage Zone. An FSx for Lustre file system is created that is used as a highly performant scratch file system in the preferred AZ.<br/>
+(5) Two Amazon S3 buckets are created: one for campaign storage using [Amazon S3 Intelligent-Tiering](https://aws.amazon.com/s3/storage-classes/intelligent-tiering/), and one for archival storage using Amazon S3 Glacier.<br/>
+(6) Random passwords are generated for both the Slurm accounting database and the Directory Service that are stored securely in [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).<br/>
+
+![Reference Architecture](/assets/images/deploying-high-performance-computing-clusters-on-aws-hpc-cluster-deployment2.png "Reference Architecture p 2")
+
+(1) Admin/DevOps users use the [AWS ParallelCluster](https://aws.amazon.com/hpc/parallelcluster/) AWS CloudFormation stack to deploy HPC resources. Resources can reference the network, storage, security, database, and user directory from the previously launched CloudFormation stacks. <br/>
+(2) The AWS ParallelCluster CloudFormation template provisions a sample cluster configuration, which includes a head node deployed in a single Availability Zone within the Management zone. It also provisions a login node deployed in a single Availability Zone within the Access zone. <br/>
+(3) The Slurm workload manager is deployed on the head node and used for managing the HPC workflow processes. <br/>
+(4) The sample cluster configuration included creates two Slurm queues that provision compute nodes within the Compute zone. One queue uses compute-optimized [Amazon Elastic Compute Cloud (Amazon EC2)](https://aws.amazon.com/ec2/) instances, while the other queue utilizes GPU-accelerated EC2 instances. <br/>
+(5) Users access this guidance by establishing a connection to the deployed login node within the Access zone, utilizing either a [NICE DCV](https://www.ni-sp.com/products/nice-dcv/), SSH, or an [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html). <br/>
+(6) Users authenticate to the log in node using a username and password stored in the [AWS Managed Microsoft Active Directory](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html). <br/>
 
 ### Cost
 

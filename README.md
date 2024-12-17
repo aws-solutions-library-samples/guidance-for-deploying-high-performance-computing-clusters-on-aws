@@ -9,9 +9,7 @@ The [National Institute of Standards and Technology (NIST)](https://www.nist.gov
 
 ### Table of Contents
 
-- [Guidance for Secure High-Performance Computing with NIST SP 800-223 on AWS](#guidance-for-secure-high-performance-computing-with-nist-sp-800-223-on-aws)
-  - [Table of Contents (required)](#table-of-contents-required)
-    - [Required](#required)
+- [Guidance for Deploying Secure High-Performance Computing Clusters on AWS](#guidance-for-deploying-secure-high-performance-computing-clusters-on-aws)
   - [Overview](#overview)
   - [Architecture Overview](#architecture-overview)
     - [Architecture diagrams](#architecture-diagrams)
@@ -69,7 +67,7 @@ Architecture diagrams below show sample NIST 800-223 based infrastructure archit
 
 ### Cost
 
-You are responsible for the cost of the AWS services used while running this Guidance. As of November 2024, the cost for running this Guidance with the default settings in the US East (N. Virginia) region is approximately $1,156 per month.
+You are responsible for the cost of the AWS services deployed and used running this guidance. As of December 2024, the cost for running this guidance with the default settings in the US East (N. Virginia) region is approximately $1,156 per month.
 
 We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
 
@@ -87,7 +85,7 @@ The following table provides a sample cost breakdown for deploying this guidance
 | Cluster | Head node, Login node | $25.00/month |
 | **Total** |  | **$1155.88/month** |
 
-***Note: This focus of this Guidance is to provide an example of securing the underlying AWS services and infrastructure that an HPC cluster will eventually run on.  It does not aim to include any costs related to running an actual HPC workload.  Please use the [AWS Pricing Calculator](https://calculator.aws/) to estimate any additional costs related to your specific HPC workload usecase.***
+***Note: This focus of this Guidance is to provide an example of securing the underlying AWS services and infrastructure that an HPC cluster will eventually run on.  It does not aim to include any costs related to running actual HPC workloads.  Please use the [AWS Pricing Calculator](https://calculator.aws/) to estimate any additional costs related to your specific HPC workload usecase.***
 
 ### Security
 
@@ -118,9 +116,9 @@ To do that, please follow the steps below:
 8. This will automatically start a download of the private key for the key pair you just created
 9. Save this key in a secure location (this key can act as your password to login to the nodes launched by this template)
 
-### AWS account requirements
+### AWS Account Requirements
 
-This deployment requires you have access to Amazon CloudFormation in your AWS account with permissions to create the following resources”
+This deployment requires you have access to Amazon CloudFormation in your AWS account with permissions to create the following resources:
 
 **AWS Services in this Guidance:**
 
@@ -215,9 +213,9 @@ Stack Exports View:
    
 ![Exports](/assets/images/deployment_steps/9_deployment.png)
 
-24.  Repeat the steps above starting with step 7. for the rest of guidance stacks moving on to the next stack in the `deployment` folder (listed in Step 3. above)
+24.  Repeat the steps above starting with step 7. for the rest of guidance stacks, moving on to the next stack source file in the `deployment` folder (listed in Step 3. above)
 
-***Important: Stacks 1-5  have input parameters that asks for the previously deployed stack names.  If you modify the stack names from their default values, you will need to also update the parameters in each subsequent stack with the appropriate name so that the relevant services can be referenced.***
+***Important: Stacks 1-5  have input parameters that ask for the previously deployed stack names.  If you modify the stack names from their default values in Step 3, you will need to also update the parameters in each subsequent stack with the appropriate name so that the relevant services can be referenced.***
 
 Below as in example of modified input parameters used for deployment of the `hpc-pc-cluster` stack: 
 
@@ -225,24 +223,23 @@ Below as in example of modified input parameters used for deployment of the `hpc
 
 ***Note: The storage, Slurm database, Active Directory, and AWS ParallelCluster stacks are intended to be simple examples for testing the NIST SP 800-223 reference architecture.  For more production ready versions of these templates, please see AWS [HPC Recipes](https://github.com/aws-samples/aws-hpc-recipes/tree/main/recipes) repository***
 
-
 ## Deployment Validation 
 
 * Open CloudFormation console and verify the status of the guidance templates with the names listed in Step 3.
 
 <!-- img src="/assets/images/deployment_steps/0_validate.png" alt="Validate" width="200" height="325" -->
-
 <img src="/assets/images/deployment_steps/nist-hpc-stacks_completed.jpg" alt="Validate deployment" width="280" height="525">
 
 * Make sure that all CloudFormation stacks are deployed successfully, with resulting status of "CREATE_COMPLETE"
 
-You can also open a nested stack whose name starts with `c-nist` and look into its `Outputs` tab to get values of some important HPC cluster parameters:
+You can also open a nested stack with the name starting with `c-nist` and look into its `Outputs` tab to get values of some important HPC cluster parameters:
 
 <img src="/assets/images/deployment_steps/c-nist-hpc-cluster-deployed.jpg" alt="Nested Stack Cluster parameters" width="900" height="525">
 
 If you need to verify that specified high performance FSx storage was provisioned, navigate to the [FSx section of AWS Console](https://us-east-1.console.aws.amazon.com/fsx/home?region=us-east-1#file-systems) and look for the FSx for Lustre entry like:
 
-<img src="/assets/images/deployment_steps/nist-hpc-storage-fsxl.jpg" alt="FSxL Storage" width="760" height="525">
+<img src="/assets/images/deployment_steps/nist-hpc-storage-fsxl.jpg" alt="FSxL Storage" width="800" height="525">
+Other services/resources deployed by guidance can also be obtained from outputs of respective CloudFormation stacks
 
 ## Next Steps 
 
@@ -268,7 +265,7 @@ You can begin using the cluster by logging in to the management node to review o
 
 Alternatively, when you launch the `5_pcluster.yaml` CloudFormation template, you can select an SSH Key pair that already exists in your AWS Account.  If you completed the prerequistes steps to create a key pair you will see it populated in this list.
 
-1. Locate your ssh key pair
+1. Locate your SSH key pair
 2. Ensure you have the proper permissions set on the key pair (read-only access)
    ```chmod 400 /path/key/ssh_key.pem```
 3. In the list of services select `EC2`
@@ -337,6 +334,8 @@ This confirms that your provisioned HPC cluster can run a compute job on its nod
 
 ## Cleanup
 
+When you no longer need to use the guidance, you should delete the AWS resources deployed by it in order to prevent ongoing charges for their use.
+
 1. In the AWS Management Console, navigate to CloudFormation and locate the 6 guidance stacks deployed.
 2. Starting with the most recent stack (not including any nested stacks), select the stack and click `Delete` button:
 
@@ -346,7 +345,7 @@ confirm your intend by clicking the `Delete` button on the pop-up screen:
 
 <img src="assets/images/deployment_steps/nist-hpc-pccluster-delete-confirm.jpg" alt="Confirm Stack Deletion">
 
-3. Repeat this for each of the 6 CloudFormation stacks deployed to remove all resources from your account
+3. Repeat this for each of the 6 CloudFormation stacks deployed to remove all resources from your account, confirm that all stacks get deleted.
    
 ## Notices
 
